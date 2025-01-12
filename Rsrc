@@ -1,0 +1,108 @@
+-- Modern Notification Library
+
+local NotificationLibrary = {}
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local tweenService = game:GetService("TweenService")
+
+-- Main Screen GUI
+local notificationGui = Instance.new("ScreenGui")
+notificationGui.Name = "ModernNotificationGui"
+notificationGui.Parent = playerGui
+notificationGui.ResetOnSpawn = false
+
+-- Notification Holder (Bottom-right)
+local notificationHolder = Instance.new("Frame")
+notificationHolder.Name = "NotificationHolder"
+notificationHolder.Parent = notificationGui
+notificationHolder.AnchorPoint = Vector2.new(1, 1)
+notificationHolder.Position = UDim2.new(0.99, 0, 0.95, 0) -- Bottom-right position
+notificationHolder.Size = UDim2.new(0.3, 0, 0.6, 0)
+notificationHolder.BackgroundTransparency = 1
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = notificationHolder
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 8)
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+-- Notification Function
+function NotificationLibrary:Notify(message, duration)
+    duration = duration or 5
+
+    -- Notification Frame (Modern Design)
+    local notificationFrame = Instance.new("Frame")
+    notificationFrame.Size = UDim2.new(1, 0, 0, 70)
+    notificationFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark Gray
+    notificationFrame.BackgroundTransparency = 0
+    notificationFrame.BorderSizePixel = 0
+    notificationFrame.Parent = notificationHolder
+    notificationFrame.LayoutOrder = -tick()
+    notificationFrame.ClipsDescendants = true
+    notificationFrame.AnchorPoint = Vector2.new(1, 1)
+
+    -- Rounded Corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = notificationFrame
+
+    -- Drop Shadow
+    local shadow = Instance.new("ImageLabel")
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217" -- Shadow image
+    shadow.ImageTransparency = 0.5
+    shadow.Size = UDim2.new(1, 14, 1, 14)
+    shadow.Position = UDim2.new(0, -7, 0, -7)
+    shadow.ZIndex = 0
+    shadow.Parent = notificationFrame
+
+    -- Text Label
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, -20, 1, -20)
+    textLabel.Position = UDim2.new(0, 10, 0, 10)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = message
+    textLabel.TextColor3 = Color3.fromRGB(235, 235, 235)
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.GothamSemibold
+    textLabel.TextWrapped = true
+    textLabel.Parent = notificationFrame
+
+    -- Timer Bar
+    local timerBar = Instance.new("Frame")
+    timerBar.Size = UDim2.new(1, 0, 0, 4)
+    timerBar.Position = UDim2.new(0, 0, 1, -4)
+    timerBar.BackgroundColor3 = Color3.fromRGB(0, 200, 255) -- Vibrant Blue
+    timerBar.BorderSizePixel = 0
+    timerBar.Parent = notificationFrame
+
+    local timerCorner = Instance.new("UICorner")
+    timerCorner.CornerRadius = UDim.new(1, 0)
+    timerCorner.Parent = timerBar
+
+    -- Timer Bar Shrink Animation
+    local timerTween = tweenService:Create(timerBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 4)})
+    timerTween:Play()
+
+    -- Slide-in Animation
+    notificationFrame.Position = UDim2.new(1, 300, 0, 0)
+    local slideInTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)})
+    slideInTween:Play()
+
+    -- Wait for duration
+    task.wait(duration)
+
+    -- Slide-out and Fade-out Animation
+    local slideOutTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(1, 300, 0, 0)})
+    local fadeOutTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4), {BackgroundTransparency = 1, TextTransparency = 1})
+
+    slideOutTween:Play()
+    fadeOutTween:Play()
+
+    slideOutTween.Completed:Connect(function()
+        notificationFrame:Destroy()
+    end)
+end
+
+return NotificationLibrary
