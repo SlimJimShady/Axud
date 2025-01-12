@@ -1,80 +1,90 @@
--- NotificationLibrary (LocalScript)
+-- Hosted Notification Library Script
 
 local NotificationLibrary = {}
 
--- SETTINGS
-local DEFAULT_DURATION = 3
-local DEFAULT_COLOR = Color3.fromRGB(255, 255, 255)
-local DEFAULT_POSITION = UDim2.new(0.5, 0, 0.1, 0)
-
--- Create the main GUI
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Create the main GUI
 local notificationGui = Instance.new("ScreenGui")
 notificationGui.Name = "NotificationGui"
 notificationGui.Parent = playerGui
 notificationGui.ResetOnSpawn = false
 
--- Create a holder for notifications
+-- Notification holder (Bottom-left)
 local notificationHolder = Instance.new("Frame")
 notificationHolder.Name = "NotificationHolder"
 notificationHolder.Parent = notificationGui
-notificationHolder.AnchorPoint = Vector2.new(0.5, 0)
-notificationHolder.Position = DEFAULT_POSITION
-notificationHolder.Size = UDim2.new(0.3, 0, 0.5, 0)
+notificationHolder.AnchorPoint = Vector2.new(0, 1)
+notificationHolder.Position = UDim2.new(0.01, 0, 0.95, 0) -- Bottom-left position
+notificationHolder.Size = UDim2.new(0.25, 0, 0.5, 0)
 notificationHolder.BackgroundTransparency = 1
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = notificationHolder
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
--- Function to create a notification
-function NotificationLibrary:Notify(message, duration, color)
-    duration = duration or DEFAULT_DURATION
-    color = color or DEFAULT_COLOR
+-- Notification function
+function NotificationLibrary:Notify(message, duration)
+    duration = duration or 5
 
     -- Notification Frame
     local notificationFrame = Instance.new("Frame")
-    notificationFrame.Size = UDim2.new(1, 0, 0, 50)
-    notificationFrame.BackgroundColor3 = color
-    notificationFrame.BackgroundTransparency = 0.2
+    notificationFrame.Size = UDim2.new(1, 0, 0, 60)
+    notificationFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Dark Gray
+    notificationFrame.BackgroundTransparency = 0
     notificationFrame.BorderSizePixel = 0
     notificationFrame.Parent = notificationHolder
     notificationFrame.LayoutOrder = -tick()
+    notificationFrame.ClipsDescendants = true
+    notificationFrame.AnchorPoint = Vector2.new(0, 1)
 
     -- Text Label
     local textLabel = Instance.new("TextLabel")
-    textLabel.Size = UDim2.new(1, -10, 1, -10)
-    textLabel.Position = UDim2.new(0, 5, 0, 5)
+    textLabel.Size = UDim2.new(1, -20, 1, -20)
+    textLabel.Position = UDim2.new(0, 10, 0, 10)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = message
     textLabel.TextColor3 = Color3.new(1, 1, 1)
     textLabel.TextScaled = true
-    textLabel.Font = Enum.Font.GothamBold
+    textLabel.Font = Enum.Font.GothamMedium
+    textLabel.TextWrapped = true
     textLabel.Parent = notificationFrame
 
-    -- Tween for fade-in effect
+    -- Timer Bar
+    local timerBar = Instance.new("Frame")
+    timerBar.Size = UDim2.new(1, 0, 0, 5)
+    timerBar.Position = UDim2.new(0, 0, 1, -5)
+    timerBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255) -- Light blue timer bar
+    timerBar.BorderSizePixel = 0
+    timerBar.Parent = notificationFrame
+
+    -- Tween for the timer bar shrinking
+    local tweenService = game:GetService("TweenService")
+    local timerTween = tweenService:Create(timerBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 5)})
+    timerTween:Play()
+
+    -- Fade-in effect
     notificationFrame.BackgroundTransparency = 1
     textLabel.TextTransparency = 1
 
-    local tweenService = game:GetService("TweenService")
-    local fadeInTween = tweenService:Create(notificationFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0.2})
-    local textFadeIn = tweenService:Create(textLabel, TweenInfo.new(0.3), {TextTransparency = 0})
+    local fadeInTween = tweenService:Create(notificationFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0})
+    local textFadeInTween = tweenService:Create(textLabel, TweenInfo.new(0.3), {TextTransparency = 0})
 
     fadeInTween:Play()
-    textFadeIn:Play()
+    textFadeInTween:Play()
 
-    -- Wait for the duration
+    -- Wait for duration
     task.wait(duration)
 
-    -- Tween for fade-out effect
+    -- Fade-out effect
     local fadeOutTween = tweenService:Create(notificationFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1})
-    local textFadeOut = tweenService:Create(textLabel, TweenInfo.new(0.3), {TextTransparency = 1})
+    local textFadeOutTween = tweenService:Create(textLabel, TweenInfo.new(0.3), {TextTransparency = 1})
 
     fadeOutTween:Play()
-    textFadeOut:Play()
+    textFadeOutTween:Play()
 
     fadeOutTween.Completed:Connect(function()
         notificationFrame:Destroy()
