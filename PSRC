@@ -1,4 +1,4 @@
--- Ultra-Premium Notification Library
+-- Rayfield-Style Notification Library
 
 local NotificationLibrary = {}
 
@@ -8,7 +8,7 @@ local tweenService = game:GetService("TweenService")
 
 -- Main GUI
 local notificationGui = Instance.new("ScreenGui")
-notificationGui.Name = "UltraPremiumNotificationGui"
+notificationGui.Name = "RayfieldNotificationGui"
 notificationGui.Parent = playerGui
 notificationGui.ResetOnSpawn = false
 
@@ -24,18 +24,18 @@ notificationHolder.BackgroundTransparency = 1
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = notificationHolder
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 12)
+UIListLayout.Padding = UDim.new(0, 8)
 UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
--- Ultra-Premium Notification Function
-function NotificationLibrary:Notify(title, description, iconId, duration)
+-- Notification Function
+function NotificationLibrary:Notify(title, description, duration)
     duration = duration or 5
 
-    -- Notification Frame with Glassmorphism
+    -- Notification Frame
     local notificationFrame = Instance.new("Frame")
-    notificationFrame.Size = UDim2.new(1, 0, 0, 120)
+    notificationFrame.Size = UDim2.new(1, 0, 0, 100)
     notificationFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    notificationFrame.BackgroundTransparency = 0.3
+    notificationFrame.BackgroundTransparency = 0
     notificationFrame.BorderSizePixel = 0
     notificationFrame.Parent = notificationHolder
     notificationFrame.LayoutOrder = -tick()
@@ -43,56 +43,36 @@ function NotificationLibrary:Notify(title, description, iconId, duration)
 
     -- Rounded Corners
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 15)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = notificationFrame
 
-    -- Glow Effect
-    local glow = Instance.new("UIStroke")
-    glow.Thickness = 2
-    glow.Color = Color3.fromRGB(0, 170, 255)
-    glow.Transparency = 0.5
-    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    glow.Parent = notificationFrame
+    -- Subtle Shadow
+    local shadow = Instance.new("UIStroke")
+    shadow.Thickness = 1
+    shadow.Color = Color3.fromRGB(50, 50, 50)
+    shadow.Transparency = 0.4
+    shadow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    shadow.Parent = notificationFrame
 
-    -- Blur Effect (Glassmorphism)
-    local blurEffect = Instance.new("UIGradient")
-    blurEffect.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200))
-    }
-    blurEffect.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.3),
-        NumberSequenceKeypoint.new(1, 0.3)
-    }
-    blurEffect.Parent = notificationFrame
-
-    -- Icon
-    local icon = Instance.new("ImageLabel")
-    icon.Size = UDim2.new(0, 60, 0, 60)
-    icon.Position = UDim2.new(0, 15, 0, 30)
-    icon.BackgroundTransparency = 1
-    icon.Image = iconId or "rbxassetid://6031071050" -- Default info icon
-    icon.Parent = notificationFrame
-
-    -- Title
+    -- Title Label
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, -90, 0, 30)
-    titleLabel.Position = UDim2.new(0, 90, 0, 15)
+    titleLabel.Size = UDim2.new(1, -20, 0, 25)
+    titleLabel.Position = UDim2.new(0, 10, 0, 10)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = title or "Notification"
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
     titleLabel.TextScaled = true
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = notificationFrame
 
-    -- Description
+    -- Description Label
     local descriptionLabel = Instance.new("TextLabel")
-    descriptionLabel.Size = UDim2.new(1, -90, 0, 50)
-    descriptionLabel.Position = UDim2.new(0, 90, 0, 50)
+    descriptionLabel.Size = UDim2.new(1, -20, 0, 50)
+    descriptionLabel.Position = UDim2.new(0, 10, 0, 40)
     descriptionLabel.BackgroundTransparency = 1
-    descriptionLabel.Text = description or "This is a premium notification."
-    descriptionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    descriptionLabel.Text = description or "This is a clean, modern notification."
+    descriptionLabel.TextColor3 = Color3.fromRGB(170, 170, 170)
     descriptionLabel.TextWrapped = true
     descriptionLabel.TextScaled = true
     descriptionLabel.Font = Enum.Font.Gotham
@@ -100,33 +80,32 @@ function NotificationLibrary:Notify(title, description, iconId, duration)
     descriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
     descriptionLabel.Parent = notificationFrame
 
-    -- Gradient Progress Bar
-    local timerBar = Instance.new("Frame")
-    timerBar.Size = UDim2.new(1, 0, 0, 5)
-    timerBar.Position = UDim2.new(0, 0, 1, -5)
-    timerBar.BackgroundTransparency = 0
-    timerBar.Parent = notificationFrame
+    -- Progress Bar
+    local progressBar = Instance.new("Frame")
+    progressBar.Size = UDim2.new(1, 0, 0, 3)
+    progressBar.Position = UDim2.new(0, 0, 1, -3)
+    progressBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    progressBar.BorderSizePixel = 0
+    progressBar.Parent = notificationFrame
 
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 170, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 170))
-    }
-    gradient.Parent = timerBar
+    local barCorner = Instance.new("UICorner")
+    barCorner.CornerRadius = UDim.new(1, 0)
+    barCorner.Parent = progressBar
 
-    local timerTween = tweenService:Create(timerBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 5)})
-    timerTween:Play()
+    -- Progress Animation
+    local barTween = tweenService:Create(progressBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 3)})
+    barTween:Play()
 
     -- Slide-in Animation
-    notificationFrame.Position = UDim2.new(1, 400, 0, 0)
-    local slideInTween = tweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)})
+    notificationFrame.Position = UDim2.new(1, 350, 0, 0)
+    local slideInTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)})
     slideInTween:Play()
 
     -- Wait for duration
     task.wait(duration)
 
-    -- Slide-out Animation
-    local slideOutTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(1, 400, 0, 0)})
+    -- Slide-out and Remove
+    local slideOutTween = tweenService:Create(notificationFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, 350, 0, 0)})
     slideOutTween:Play()
     slideOutTween.Completed:Connect(function()
         notificationFrame:Destroy()
